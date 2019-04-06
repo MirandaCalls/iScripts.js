@@ -1,0 +1,49 @@
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
+<style>
+    p {
+        margin-bottom: 0px;
+    }
+    body {
+        font-family: -apple-system;
+    }
+    table {
+        border-collapse: collapse;
+    }
+    table, th, td {
+        border: 1px solid black;
+    }
+    td {
+        padding: 10px;
+    }
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .loss-amount {
+        color: #878181;
+        font-size: small;
+    }
+</style>
+<table class="center">
+    <tr>
+        <td>
+            <p>Maintain Weight</p>
+        </td>
+        <td style="background-color: #dadbda;">{maintainAmount} Calories/Day</td>
+    </tr>
+    <tr>
+        <td>
+            <p>Weight Loss</p>
+            <span class="loss-amount">1 lb/week</span>
+        </td>
+        <td style="background-color: #9ce09c;">{lossAmount} Calories/Day</td>
+    </tr>
+    <tr>
+        <td>
+            <p>Extreme Weight Loss</p>
+            <span class="loss-amount">2 lb/week</span>
+        </td>
+        <td style="background-color: #18c018;">{extremeLossAmount} Calories/Day</td>
+    </tr>
+</table>

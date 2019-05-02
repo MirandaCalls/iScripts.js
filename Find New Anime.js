@@ -34,7 +34,7 @@ async function display_season( season, year ) {
 	let season_header = season + ' ' + year;
 	title_row.addText( season_header ).leftAligned();
 	
-	let season_btn = title_row.addButton( "+ Season" );
+	let season_btn = title_row.addButton( "Season 🗓" );
 	season_btn.rightAligned();
 	season_btn.onTap = async function() {
 		let new_season = await pick_season();
@@ -52,16 +52,13 @@ async function display_season( season, year ) {
 		let details = await getShowDetails( show );
 
 		let imageCell = row.addImageAtURL( details.imageUrl );
-		let summary_text = details.synopsis.split( "\n" )[0].substr( 0, 250 );
-		if ( details.synopsis.length > 250 ) {
-			summary_text += '...';
-		}
+		let summary_text = details.showType + "\nStarts " + details.startDate;
 		let detailsCell = row.addText( details.title, summary_text );
 	
-		imageCell.widthWeight = 10;
-		detailsCell.widthWeight = 90;
+		imageCell.widthWeight = 20;
+		detailsCell.widthWeight = 80;
 	
-		row.height = 150
+		row.height = 100;
 		row.cellSpacing = 10;
 	
 		row.onSelect = async ( idx ) => {
@@ -116,6 +113,9 @@ async function getShowDetails( kitsuShow, loadCategories = false ) {
 	}
 
 	result.imageUrl = kitsuShow.attributes.posterImage.medium;
+
+	let subtype = kitsuShow.attributes.subtype;
+	result.showType = subtype.charAt( 0 ).toUpperCase() + subtype.substring( 1 );
 	result.synopsis = kitsuShow.attributes.synopsis;
 	result.startDate = kitsuShow.attributes.startDate;
 	result.videoUrl = "https://www.youtube.com/embed/" + kitsuShow.attributes.youtubeVideoId;

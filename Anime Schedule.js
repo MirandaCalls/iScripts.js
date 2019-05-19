@@ -11,7 +11,7 @@ let days = [
      "Saturday"
 ];
 
-let library_url = "https://kitsu.io/api/edge/library-entries?filter[status]=current&filter[userId]=402618";
+let library_url = "https://kitsu.io/api/edge/library-entries?filter[status]=current&filter[userId]=402618&page[limit]=20";
 let req = new Request( library_url );
 let json = await req.loadJSON();
 

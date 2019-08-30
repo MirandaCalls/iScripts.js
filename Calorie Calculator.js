@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: red; icon-glyph: weight;
+// icon-color: cyan; icon-glyph: weight;
 const SEDENTARY = 1.2;
 const LIGHT = 1.375;
 const MODERATE = 1.465;

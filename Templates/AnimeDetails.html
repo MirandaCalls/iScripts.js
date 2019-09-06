@@ -1,107 +1,106 @@
-<!DOCTYPE HTML>
-<html>
-     <head>
-          <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
-          <style>
-               body {
-                    font-family: -apple-system;
-                    color: #fff;
-                    background-color: #000;
-                    margin: 0;
-               }
-               .collapsible {
-                    cursor: pointer;
-                    background-color: black;
-                    color: white;
-                    padding: 10px;
-                    width: 100%;
-                    border-width: 1px 1px 1px 1px;
-                    border-radius: 5px;
-                    border-style: solid;
-                    border-color: #6e6e6e;
-                    text-align: left;
-                    outline: none;
-                    font-size: 15px;
-                    margin-top: 20px;
-               }
-               .collapsible::after {
-                    content: '\02795'; /* Unicode character for "plus" sign (+) */
-                    font-size: 13px;
-                    color: white;
-                    float: right;
-               }
-               .active::after {
-                    content: "\2796" !important; /* Unicode character for "minus" sign (-) */
-                    color: white;
-               }
-               .collapsible-content {
-                    overflow: hidden;
-                    max-height: 0;
-                    transition: max-height 0.2s ease-out;
-               }
-               .preview-video {
-                    margin-top: 10px;
-                    width: 98%;
-                    height: 450px;
-               }
-               .center {
-                    display: block;
-                    margin-left: auto;
-                    margin-right: auto;
-               }
-               .poster {
-                    width: 90%;
-               }
-               #show_title {
-                    text-align: center;
-                    width: 100%;
-                    background-color: #363535;
-                    margin-bottom: 20px;
-                    padding-top: 10px;
-                    padding-bottom: 10px;
-                    margin-top: 0px;
-               }
-               .details-content {
-                    margin: 10px;
-               }
-               .details-list {
-                    background-color: #21212c;
-                    padding: 10px;
-                    border-radius: 5px;
-                    margin-top: 10px;
-               }
-               .details-list > p {
-                    margin: 5px;
-               }
-          </style>
-     </head>
-     <body>
-          <div>
-               <h3 id="show_title">{title}</h3>
-               <div class="details-content">
-                    <img class="center poster" src="{imageUrl}"/>
-                    <button id="video_collapse" class="collapsible">YouTube Preview</button>
-                    <div id="video_content" class="collapsible-content">
-                         <iframe class="center preview-video" src="{videoUrl}"></iframe>
-                    </div>
-                    <div class="details-list">
-                         <p><strong>Start Date:</strong> {startDate}</p>
-                         <p><strong>Categories:</strong> {categories}</p>
-                         <p><strong>Synopsis:</strong> {synopsis}</p>
-                    </div>
+<!DOCTYPE HTML><html>
+<head>
+     <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
+     <style>
+          body {
+               font-family: -apple-system;
+               color: #fff;
+               background-color: #000;
+               margin: 0;
+          }
+          .collapsible {
+               cursor: pointer;
+               background-color: black;
+               color: white;
+               padding: 10px;
+               width: 100%;
+               border-width: 1px 1px 1px 1px;
+               border-radius: 5px;
+               border-style: solid;
+               border-color: #6e6e6e;
+               text-align: left;
+               outline: none;
+               font-size: 15px;
+               margin-top: 20px;
+          }
+          .collapsible::after {
+               content: '\02795'; /* Unicode character for "plus" sign (+) */
+               font-size: 13px;
+               color: white;
+               float: right;
+          }
+          .active::after {
+               content: "\2796" !important; /* Unicode character for "minus" sign (-) */
+               color: white;
+          }
+          .collapsible-content {
+               overflow: hidden;
+               max-height: 0;
+               transition: max-height 0.2s ease-out;
+          }
+          .preview-video {
+               margin-top: 10px;
+               width: 98%;
+               height: 450px;
+          }
+          .center {
+               display: block;
+               margin-left: auto;
+               margin-right: auto;
+          }
+          .poster {
+               width: 90%;
+          }
+          #show_title {
+               text-align: center;
+               width: 100%;
+               background-color: #363535;
+               margin-bottom: 20px;
+               padding-top: 10px;
+               padding-bottom: 10px;
+               margin-top: 0px;
+          }
+          .details-content {
+               margin: 10px;
+          }
+          .details-list {
+               background-color: #21212c;
+               padding: 10px;
+               border-radius: 5px;
+               margin-top: 10px;
+          }
+          .details-list > p {
+               margin: 5px;
+          }
+     </style>
+</head>
+<body>
+     <div>
+          <h3 id="show_title">{{title}}</h3>
+          <div class="details-content">
+               <img class="center poster" src="{{imageUrl}}"/>
+               <button id="video_collapse" class="collapsible">YouTube Preview</button>
+               <div id="video_content" class="collapsible-content">
+                    <iframe class="center preview-video" src="{{videoUrl}}"></iframe>
+               </div>
+               <div class="details-list">
+                    <p><strong>Start Date:</strong> {{startDate}}</p>
+                    <p><strong>Categories:</strong> {{categories}}</p>
+                    <p><strong>Synopsis:</strong> {{synopsis}}</p>
                </div>
           </div>
-          <script>
-               let collapse_button = document.getElementById( "video_collapse" );
-               collapse_button.addEventListener( "click", function() {
-                    this.classList.toggle( "active" );
-                    let content = document.getElementById( 'video_content' );
-                    if ( content.style.maxHeight ) {
-                         content.style.maxHeight = null;
-                    } else {
-                         content.style.maxHeight = content.scrollHeight + "px";
-                    } 
-               } );
-          </script>
-     </body>
+     </div>
+     <script>
+          let collapse_button = document.getElementById( "video_collapse" );
+          collapse_button.addEventListener( "click", function() {
+               this.classList.toggle( "active" );
+               let content = document.getElementById( 'video_content' );
+               if ( content.style.maxHeight ) {
+                    content.style.maxHeight = null;
+               } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+               } 
+          } );
+     </script>
+</body>
 </html>

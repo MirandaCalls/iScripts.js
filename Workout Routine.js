@@ -73,7 +73,7 @@ function renderWorkouts() {
 	});
 
 	let preview_row = new UITableRow();
-	let btn_prev_text = preview_row.addText('Preview Cycles');
+	let btn_prev_text = preview_row.addText('Preview Routine');
 	btn_prev_text.titleColor = appleBlue();
 	preview_row.dismissOnSelect = false;
 	preview_row.onSelect = () => {

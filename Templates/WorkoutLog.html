@@ -1,0 +1,44 @@
+<!DOCTYPE HTML><html>
+    <head>
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body class="bg-dark text-white">
+        <div class="container">
+            <h2 class="mt-2">Log Item</h2>
+            <hr class="border-light" />
+            <div class="list-group mb-3">
+                <div class="list-group-item bg-secondary">
+                    <small>Date</small>
+                    <p class="mb-1">{{date}}</p>
+                </div>
+                <div class="list-group-item bg-secondary">
+                    <small>Cycle Day</small>
+                    <p class="mb-1">{{day}}</p>
+                </div>
+                <div class="list-group-item bg-secondary">
+                    <small>Repetitions</small>
+                    <p class="mb-1">{{reps}}</p>
+                </div>
+            </div>
+            <table class="table bg-secondary text-white">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Weight</th>
+                        <th scope="col">Passed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%workouts%}
+                    <tr>
+                        <td>{{name}}</td>
+                        <td>{{weight}} lbs</td>
+                        <td>{{failedIcon}}</td>
+                    </tr>
+                    {%end%}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

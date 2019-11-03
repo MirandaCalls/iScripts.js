@@ -1,0 +1,67 @@
+<!DOCTYPE HTML><html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body class="bg-dark text-white">
+    <div class="container">
+        <h2 class="mt-2">Log Workout</h2>
+        <hr class="border-light" />
+        <form class="text-white">
+            <div class="form-group">
+                <label for="DaySelect">Routine Day</label>
+                <select class="form-control" id="DaySelect">
+                    <option value="1">Day 1</option>
+                    <option value="2">Day 2</option>
+                    <option value="3">Day 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="RepSelect">Repetitions</label>
+                <select class="form-control" id="RepSelect">
+                    <option value="8">8 repetitions</option>
+                    <option value="9">9 repetitions</option>
+                    <option value="10">10 repetitions</option>
+                    <option value="11">11 repetitions</option>
+                    <option value="12">12 repetitions</option>
+                </select>
+            </div>
+            <label>Failed</label>
+            <div class="form-group">
+                {%workoutList%}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="{{workout_id}}" id="CheckFail{{workout_id}}">
+                    <label class="form-check-label" for="CheckFail{{workout_id}}">{{label}}</label>
+                </div>
+                {%end%}
+            </div>
+            <button type="button" id="BtnSubmit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+    </div>
+</body>
+<script>
+    let btn_submit = document.getElementById("BtnSubmit");
+    btn_submit.onclick = () => {
+        let day_selector = document.getElementById("DaySelect");
+        let day = day_selector.options[day_selector.selectedIndex].value;
+
+        let checked_boxes = document.querySelectorAll("input[type=checkbox]:checked");
+        let failed = [];
+        for (checkbox of checked_boxes) {
+            failed.push(checkbox.value);
+        }
+        failed = failed.join(",");
+
+        let rep_selector = document.getElementById("RepSelect");
+        let reps = rep_selector.options[rep_selector.selectedIndex].value;
+
+        let new_log = {
+            day: day,
+            failed: failed,
+            reps: reps
+        };
+
+        window.location = "scriptable:///run?scriptName=Workout%20Log&new=" + encodeURIComponent(JSON.stringify(new_log));
+    };
+</script>
+</html>

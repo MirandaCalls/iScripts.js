@@ -1,49 +1,30 @@
-<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
-<style>
-    p {
-        margin-bottom: 0px;
-    }
-    body {
-        font-family: -apple-system;
-    }
-    table {
-        border-collapse: collapse;
-    }
-    table, th, td {
-        border: 1px solid black;
-    }
-    td {
-        padding: 10px;
-    }
-    .center {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .loss-amount {
-        color: #878181;
-        font-size: small;
-    }
-</style>
-<table class="center">
-    <tr>
-        <td>
-            <p>Maintain Weight</p>
-        </td>
-        <td style="background-color: #dadbda;">{{maintainAmount}} Calories/Day</td>
-    </tr>
-    <tr>
-        <td>
-            <p>Weight Loss</p>
-            <span class="loss-amount">1 lb/week</span>
-        </td>
-        <td style="background-color: #9ce09c;">{{lossAmount}} Calories/Day</td>
-    </tr>
-    <tr>
-        <td>
-            <p>Extreme Weight Loss</p>
-            <span class="loss-amount">2 lb/week</span>
-        </td>
-        <td style="background-color: #18c018;">{{extremeLossAmount}} Calories/Day</td>
-    </tr>
-</table>
+<!DOCTYPE HTML><html>
+        <head>
+            <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        </head>
+        <body class="bg-dark">
+            <table class="table bg-secondary">
+                <tr>
+                    <td class="text-white">
+                        <p class="mb-1">Maintain Weight</p>
+                    </td>
+                    <td style="background-color: #dadbda;">{{maintainAmount}} Calories/Day</td>
+                </tr>
+                <tr>
+                    <td class="text-white">
+                        <p class="mb-1">Weight Loss</p>
+                        <small>1 lb/week</small>
+                    </td>
+                    <td style="background-color: #9ce09c;">{{lossAmount}} Calories/Day</td>
+                </tr>
+                <tr>
+                    <td class="text-white">
+                        <p class="mb-1">Extreme Weight Loss</p>
+                        <small>2 lb/week</small>
+                    </td>
+                    <td style="background-color: #18c018;">{{extremeLossAmount}} Calories/Day</td>
+                </tr>
+            </table>
+        </body>
+</html>

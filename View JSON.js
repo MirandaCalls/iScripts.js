@@ -1,7 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: deep-green; icon-glyph: code;
-// share-sheet-inputs: file-url, url, plain-text;
+// icon-color: teal; icon-glyph: code; share-sheet-inputs: file-url, url, plain-text;
 // Depending on a user selection, performs one of two actions:
 // 1. Pretty prints a JSON string
 // 2. Presents a UI to browse a JSON object or arary

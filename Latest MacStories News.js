@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: red; icon-glyph: newspaper;
+// icon-color: blue; icon-glyph: newspaper;
 // Shows latest news from MacStories in a table.
 // The table shows an image from the article, if available, and the title of the article.
 let url = "https://macstories.net/feed/json";

@@ -1,7 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: deep-gray; icon-glyph: reply;
-// share-sheet-inputs: file-url, url, plain-text, image;
+// icon-color: teal; icon-glyph: reply; share-sheet-inputs: file-url, url, plain-text, image;
 // Run from a share sheet to see which
 // arguments are shared. Arguments are
 // passed to a script when it is run

@@ -4,7 +4,13 @@
 const { renderTemplate } = importModule('Modules/WebUI.js');
 const ICloud = importModule("Modules/ICloud.js");
 
+const WORKOUT_INTENSITIES = {
+    1: "Heavy",
+    2: "Medium",
+    3: "Light"
+};
 const HEX_APPLE_BLUE = '#007AFF';
+const HEX_SUB_COLOR = '#adadad';
 let logs = ICloud.loadJSON("workout_logs.json");
 let workouts = ICloud.loadJSON("workouts.json").workouts;
 
@@ -14,16 +20,16 @@ if ("new" in args.queryParameters)
     let failed_indexes = log_data.failed.split(",");
     let new_log = {
         datetime: (new Date()).toISOString(),
-        day: log_data.day,
+        intensity: log_data.intensity,
         reps: log_data.reps,
         workouts: []
     };
     workouts.forEach((workout, idx) => {
         let weight = workout.weight;
-        if (new_log.day == 2)
+        if (new_log.intensity == 2)
         {
             weight = round5(weight * .9);
-        } else if (new_log.day == 3)
+        } else if (new_log.intensity == 3)
         {
             weight = round5(weight * .8);
         }
@@ -36,6 +42,9 @@ if ("new" in args.queryParameters)
         });
     });
     logs.unshift(new_log);
+    ICloud.saveJSON(logs, 'workout_logs.json');
+} else if ("delete" in args.queryParameters) {
+    logs.splice(args.queryParameters.delete, 1);
     ICloud.saveJSON(logs, 'workout_logs.json');
 }
 
@@ -52,7 +61,7 @@ function renderLogs()
     let add_new_row = new UITableRow();
     add_new_row.dismissOnSelect = false;
     let add_text = add_new_row.addText('Add Log');
-    add_text.titleColor = appleBlue();
+    add_text.titleColor = new Color(HEX_APPLE_BLUE);
     add_new_row.onSelect = submitWorkoutForm;
     table.addRow(add_new_row);
 
@@ -60,9 +69,13 @@ function renderLogs()
     {
         let row = new UITableRow();
         row.dismissOnSelect = false;
+        row.height = 60;
         let log_date = new Date(log.datetime);
-        let log_text = "Day " + log.day + " - " + log_date.toDateString();
-        row.addText(log_text).widthWeight = 70;
+        let date = log_date.toDateString();
+        let details = WORKOUT_INTENSITIES[log.intensity] + " / " + log.reps + " reps";
+        let details_text = row.addText(date, details);
+        details_text.widthWeight = 70;
+        details_text.subtitleColor = new Color(HEX_SUB_COLOR);
 
         let failed_count = 0;
         for (workout of log.workouts)
@@ -76,18 +89,19 @@ function renderLogs()
         row.onSelect = (selectionIdx) => {
             let log_entry = logs[selectionIdx-1];
             let date_added = new Date(log_entry.datetime);
+            log_entry.log_index = selectionIdx-1;
             log_entry.date = date_added.toLocaleString();
+            log_entry.intensity_name = WORKOUT_INTENSITIES[log_entry.intensity];
             log_entry.workouts.forEach((workout, idx) => {
                 log_entry.workouts[idx].failedIcon = workout.failed ? '❌' : '✅';
             });
-            renderTemplate("WorkoutLog.html", log_entry);
+            renderTemplate("ViewWorkoutLog.html", log_entry);
         };
         table.addRow(row);
     }
 }
 
-function submitWorkoutForm()
-{
+function submitWorkoutForm() {
     let data = {
         workoutList: []
     };
@@ -97,16 +111,9 @@ function submitWorkoutForm()
             label: workout.name
         });
     });
-    renderTemplate("WorkoutLogForm.html", data);
+    renderTemplate("SubmitWorkoutLog.html", data);
 }
 
-function round5(x)
-{
+function round5(x) {
     return Math.ceil(x / 5) * 5;
-}
-
-function appleBlue()
-{
-	let color = new Color( HEX_APPLE_BLUE );
-	return color;
 }

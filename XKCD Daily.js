@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: deep-purple; icon-glyph: image;
+// icon-color: blue; icon-glyph: image;
 // Loads the latest XKCD comic from
 // xkcd.com and shows it. Works well
 // when run from a Siri Shortcut.

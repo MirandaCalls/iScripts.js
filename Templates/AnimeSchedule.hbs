@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
+        <style>
+            body {
+                margin: 0px;
+                background-color: black;
+                background-image: url(https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimage.pushauction.com%2F0%2F0%2F15bfc40c-7524-4d7b-b33f-59ee0725ab2d%2F4e7a1136-c682-4fa7-a73d-dd054050acc4.jpg&f=1&nofb=1);
+                background-size: cover;
+            }
+            .page-scroll {
+                padding: 8px;
+                height: 90vh;
+                overflow: scroll;
+            }
+            .calendar-layout {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                grid-gap: 1em;
+            }
+            .calendar-day {
+                border: 1px solid transparent;
+                border-radius: 15px;
+                padding: 8px;
+                background-color: #e9967a7a;
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
+            .calendar-day-header {
+                color: #333;
+                font-family: sans-serif;
+                font-size: 15px;
+                margin-bottom: 8px;
+            }
+            .day-number {
+                background-color: white;
+                color: black;
+                border-radius: 5px;
+                margin-right: 4px;
+                padding: 2px;
+                font-size: 15px;
+            }
+            .anime-scroll {
+                white-space: nowrap;
+                overflow-x: scroll;
+                overflow-y: hidden;
+            }
+            .img-show {
+                width: 100px;
+                display: inline-block;
+            }
+            .no-content {
+                color: #333;
+                font-family: sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="page-scroll">
+            <div class="calendar-layout">
+                {{#each days}}
+                    <div class="calendar-day">
+                        <div class="calendar-day-header"><span class="day-number">{{this.date}}</span>{{this.header}}</div>
+                        {{#if this.message}}
+                            <p class="no-content">{{this.message}}</p>
+                        {{else}}
+                            <div class="anime-scroll">
+                                {{#each this.images}}
+                                    <img class="img-show" src="{{this}}">
+                                {{/each}}
+                            </div>
+                        {{/if}}
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+    </body>
+</html>

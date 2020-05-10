@@ -1,149 +1,132 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: pink; icon-glyph: calendar-alt;
-let days = [
-     "Sunday",
-     "Monday",
-     "Tuesday",
-     "Wednesday",
-     "Thursday",
-     "Friday",
-     "Saturday"
-];
+const Handlebars = importModule( 'Modules/handlebars.js' );
 
-let library_url = "https://kitsu.io/api/edge/library-entries?filter[status]=current&filter[userId]=402618&page[limit]=20";
-let req = new Request( library_url );
-let json = await req.loadJSON();
-
-let anime_urls = [];
-for ( entry of json.data ) {
-     anime_urls.push( entry.relationships.anime.links.related );
+class Anime {
+     constructor(title, image, startDate, endDate) {
+          this.title = title;
+          this.image = image;
+          this.start_date = startDate;
+          this.end_date = endDate;
+     }
 }
 
-let shows = await Promise.all( anime_urls.map( async function( url ) {
-     let req = new Request( url );
-     return await req.loadJSON();
-} ) );
-
-let notify_enabled, fm, data_path;
-if ( config.runsInApp ) {
-	fm = FileManager.iCloud();
-	data_path = fm.joinPath( fm.documentsDirectory(), "/Data/anime_schedule.json" );
-     notify_enabled = JSON.parse( fm.readString( data_path ) ).notify_enabled;
-}
-let schedule = [[],[],[],[],[],[],[]];
-
-for ( show of shows ) {
-     if ( null === show.data ) {
-          continue;
+class LibraryEntry {
+     constructor(type, resourceData) {
+          this.type = type;
+          this.resource = resourceData;
      }
-
-     if ( null !== show.data.attributes.endDate ) {
-          let current_date = new Date();
-          let end_date = new Date( show.data.attributes.endDate );
-          if ( end_date < current_date ) {
-               continue;
-          }
-     }
-
-     let titles = show.data.attributes.titles;
-     let title = "";
-     if ( "en" in titles ) {
-          title = titles.en;
-     } else if ( "en_jp" in titles ) {
-          title = titles.en_jp;
-     } else {
-          title = titles.ja_jp;
-     }
-
-     let show_date = new Date( show.data.attributes.startDate );
-     let day = show_date.getUTCDay();
-     schedule[ day ].push( title );
 }
 
-let table = new UITable();
-table.showSeparators = true;
-
-render_table();
-await QuickLook.present( table );
-
-if ( config.runsInApp ) {
-	let schedule_data = {
-	     notify_enabled: notify_enabled
-	};
-	fm.writeString( data_path, JSON.stringify( schedule_data ) );
-}
-
-function render_table() {
-     table.removeAllRows();
-
-     if ( config.runsInApp ) {
-          let notify_toggle_row = new UITableRow();
-          notify_toggle_row.height = 40;
-          notify_toggle_row.addText( "Notifications" );
-          notify_toggle_row.backgroundColor = Color.darkGray();
-
-          let btn_text = notify_enabled ? "Disable 🗑" : "Enable ⏰";
-          let enable_btn = notify_toggle_row.addButton( btn_text );
-          enable_btn.rightAligned();
-          enable_btn.onTap = toggle_notifications;
-     
-          table.addRow( notify_toggle_row );
+class KitsuApi {
+     constructor(userId) {
+          this.url = 'https://kitsu.io/api/edge';
+          this.user_id = userId;
      }
 
-     for ( let i in schedule ) {
-          if ( schedule[ i ].length == 0 ) {
-               continue;
+     async getLibraryEntries() {
+          let self = this;
+          let url = `${this.url}/library-entries?filter[status]=current&filter[userId]=${this.user_id}&filter[kind]=anime&page[limit]=20`;
+          let req = new Request(url);
+          let response = await req.loadJSON();
+          return await Promise.all(response.data.map(async function(data) {
+               let req = new Request(data.relationships.anime.links.related);
+               let response = await req.loadJSON();
+               return new LibraryEntry(
+                    "anime",
+                    self._buildAnimeEntity(response.data)
+               );
+          }));
+     }
+
+     _buildAnimeEntity(entity) {
+          let titles = entity.attributes.titles;
+          let title = "";
+          if ( "en" in titles ) {
+               title = titles.en;
+          } else if ( "en_jp" in titles ) {
+               title = titles.en_jp;
+          } else {
+               title = titles.ja_jp;
           }
 
-          let header_row = new UITableRow();
-          header_row.isHeader = true;
-          header_row.height = 60;
-          header_row.addText( days[ i ] );
+          let img = entity.attributes.posterImage.medium;
+          let start_date = entity.attributes.startDate;
+          let end_date = entity.attributes.endDate;
 
-          table.addRow( header_row );
-
-          for ( title of schedule[ i ] ) {
-               let row = new UITableRow();
-               row.addText( title );
-               row.height = 40;
-               table.addRow( row );
-          }
+          return new Anime(
+               title,
+               img,
+               start_date,
+               end_date
+          );
      }
-
-     table.reload();
 }
 
-function toggle_notifications() {
-     notify_enabled = !notify_enabled;
-
-     if ( notify_enabled ) {
-          for ( let i in schedule ) {
-               if ( schedule[ i ].length > 0 ) {
-                    schedule_weekday( schedule[ i ], parseInt( i ) + 1 );
-               }
-          }   
-     } else {
-          unschedule_notifications();
-     }
-
-     render_table();
-}
-
-function schedule_weekday( titles, weekday ) {
+function scheduleWeekday(titles, dayNum) {
      let notify = new Notification();
-     notify.setWeeklyTrigger( weekday, 8, 0, true );
+     notify.setWeeklyTrigger(dayNum + 1, 8, 0, true);
      notify.title = "New Episode" + titles.length > 0 ? "s" : "";
-     notify.body = titles.join( "\n" );
+     notify.body = titles.join("\n");
      notify.threadIdentifier = 'anime_schedule';
      notify.schedule();
 }
 
-async function unschedule_notifications() {
+async function resetNotifications() {
      let notifications = await Notification.allPending();
-     for ( let notification of notifications ) {
-          if ( notification.threadIdentifier === 'anime_schedule' ) {
+     for (let notification of notifications) {
+          if (notification.threadIdentifier === 'anime_schedule') {
                notification.remove();
           }
      }
 }
+
+let api = new KitsuApi('402618');
+let library_entries = await api.getLibraryEntries();
+resetNotifications();
+
+let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+let view_data = {
+     days: []
+};
+let now = new Date();
+let end_date = new Date();
+end_date.setDate(now.getDate() + 6);
+for (let d = now; d <= end_date; d.setDate(d.getDate() + 1)) {
+     let day_num = d.getDay();
+     let titles = [];
+     let images = [];
+     library_entries.forEach((entry) => {
+          if (null !== entry.resource.end_date) {
+               let show_end_date = new Date(entry.resource.end_date);
+               if (show_end_date < d) {
+                    return;
+               }
+          }
+          let show_start_date = new Date(entry.resource.start_date);
+          if (day_num == show_start_date.getUTCDay()) {
+               titles.push(entry.resource.title);
+               images.push(entry.resource.image);
+          }
+     });
+
+     let message = false;
+     if (images.length == 0) {
+          message = 'No new episodes.';
+     } else {
+          scheduleWeekday(titles, day_num);
+     }
+     view_data.days.push({
+          date: d.getDate(),
+          header: days[day_num],
+          message: message,
+          images: images
+     });
+}
+
+let fm = FileManager.iCloud();
+let template = Handlebars.compile(fm.readString(fm.documentsDirectory() + "/Templates/AnimeSchedule.hbs"));
+let html = template(view_data);
+Script.setShortcutOutput(html);
+Script.complete();

@@ -86,15 +86,20 @@ let api = new KitsuApi('402618');
 let library_entries = await api.getLibraryEntries();
 resetNotifications();
 
-let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+let days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
 let view_data = {
      days: []
 };
 let now = new Date();
+let day_num_start = now.getDay();
 let end_date = new Date();
 end_date.setDate(now.getDate() + 6);
 for (let d = now; d <= end_date; d.setDate(d.getDate() + 1)) {
      let day_num = d.getDay();
+	 let header = days[day_num];
+	 if (day_num == day_num_start) {
+		  header = "TODAY";	
+	 }
      let titles = [];
      let images = [];
      library_entries.forEach((entry) => {
@@ -119,7 +124,7 @@ for (let d = now; d <= end_date; d.setDate(d.getDate() + 1)) {
      }
      view_data.days.push({
           date: d.getDate(),
-          header: days[day_num],
+          header: header,
           message: message,
           images: images
      });

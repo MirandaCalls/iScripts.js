@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: deep-blue; icon-glyph: weight;
+// icon-color: cyan; icon-glyph: weight;
 const renderTemplate = importModule( 'Modules/WebUI.js' ).renderTemplate;
 
 const SEDENTARY = 1.2;

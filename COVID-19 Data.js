@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: orange; icon-glyph: flask;
+// icon-color: yellow; icon-glyph: flask;
 function CSVToArray(strData, strDelimiter) {
     const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"),"gi");
     let arrMatches = null, arrData = [[]];

@@ -1,137 +1,132 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: pink; icon-glyph: calendar-alt;
-const Handlebars = importModule( 'Modules/handlebars.js' );
+var Handlebars = importModule( 'Modules/handlebars.js' );
+var Kitsu = importModule('Modules/kitsu.js');
 
-class Anime {
-     constructor(title, image, startDate, endDate) {
-          this.title = title;
-          this.image = image;
-          this.start_date = startDate;
-          this.end_date = endDate;
-     }
-}
+const NOTIFY_KEY = "anime_schedule";
+const DAYS = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
 
-class LibraryEntry {
-     constructor(type, resourceData) {
-          this.type = type;
-          this.resource = resourceData;
-     }
-}
+var api = new Kitsu();
+api.setUserConfig({
+	userId: "402618"
+});
 
-class KitsuApi {
-     constructor(userId) {
-          this.url = 'https://kitsu.io/api/edge';
-          this.user_id = userId;
-     }
+await main();
+Script.complete();
 
-     async getLibraryEntries() {
-          let self = this;
-          let url = `${this.url}/library-entries?filter[status]=current&filter[userId]=${this.user_id}&filter[kind]=anime&page[limit]=20`;
-          let req = new Request(url);
-          let response = await req.loadJSON();
-          return await Promise.all(response.data.map(async function(data) {
-               let req = new Request(data.relationships.anime.links.related);
-               let response = await req.loadJSON();
-               return new LibraryEntry(
-                    "anime",
-                    self._buildAnimeEntity(response.data)
-               );
-          }));
-     }
-
-     _buildAnimeEntity(entity) {
-          let titles = entity.attributes.titles;
-          let title = "";
-          if ( "en" in titles ) {
-               title = titles.en;
-          } else if ( "en_jp" in titles ) {
-               title = titles.en_jp;
-          } else {
-               title = titles.ja_jp;
-          }
-
-          let img = entity.attributes.posterImage.medium;
-          let start_date = entity.attributes.startDate;
-          let end_date = entity.attributes.endDate;
-
-          return new Anime(
-               title,
-               img,
-               start_date,
-               end_date
-          );
-     }
-}
-
-function scheduleWeekday(titles, dayNum) {
-     let notify = new Notification();
-     notify.setWeeklyTrigger(dayNum + 1, 8, 0, true);
-     notify.title = "New Episode" + titles.length > 0 ? "s" : "";
-     notify.body = titles.join("\n");
-     notify.threadIdentifier = 'anime_schedule';
-     notify.schedule();
-}
+async function main() {
+	resetNotifications();
+	var entries = await api.getLibraryEntries();
+	var schedule = buildSchedule(entries);
+	schedule.forEach((day) => {
+		scheduleWeekday(day.titles, day.dayIndex);
+	});
+	
+	var html = renderView({
+		days: schedule
+	});
+	if (config.runsInApp) {
+		WebView.loadHTML(html);
+	} else {
+		Script.setShortcutOutput(html);
+	}
+};
 
 async function resetNotifications() {
-     let notifications = await Notification.allPending();
-     for (let notification of notifications) {
-          if (notification.threadIdentifier === 'anime_schedule') {
-               notification.remove();
-          }
-     }
+	let notifications = await Notification.allPending();
+	for (let notification of notifications) {
+		if (notification.threadIdentifier === NOTIFY_KEY) {
+			  notification.remove();
+		}
+	}
 }
 
-let api = new KitsuApi('402618');
-let library_entries = await api.getLibraryEntries();
-resetNotifications();
-
-let days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
-let view_data = {
-     days: []
-};
-let now = new Date();
-let day_num_start = now.getDay();
-let end_date = new Date();
-end_date.setDate(now.getDate() + 6);
-for (let d = now; d <= end_date; d.setDate(d.getDate() + 1)) {
-     let day_num = d.getDay();
-	 let header = days[day_num];
-	 if (day_num == day_num_start) {
-		  header = "TODAY";	
-	 }
-     let titles = [];
-     let images = [];
-     library_entries.forEach((entry) => {
-          if (null !== entry.resource.end_date) {
-               let show_end_date = new Date(entry.resource.end_date);
-               if (show_end_date < d) {
-                    return;
-               }
-          }
-          let show_start_date = new Date(entry.resource.start_date);
-          if (day_num == show_start_date.getUTCDay()) {
-               titles.push(entry.resource.title);
-               images.push(entry.resource.image);
-          }
-     });
-
-     let message = false;
-     if (images.length == 0) {
-          message = 'No new episodes.';
-     } else {
-          scheduleWeekday(titles, day_num);
-     }
-     view_data.days.push({
-          date: d.getDate(),
-          header: header,
-          message: message,
-          images: images
-     });
+function buildSchedule(entries) {
+	var schedule = [];
+	var now = new Date();
+	var end_date = new Date().setDate(now.getDate() + 6);
+	var shows = entries.map((entry) => {
+		return entry.anime;
+	}).filter((anime) => {
+		return !hasAnimeEnded(anime);
+	});
+	
+	for (let date = now; date <= end_date; date.setDate(date.getDate() + 1)) {
+		let header = getWeekdayHeader(date);
+		let shows_today = shows.filter((anime) => {
+			var start_date = new Date(anime.startDate);
+			var airs_on_this_day = date.getDay() == start_date.getUTCDay();
+			return airs_on_this_day;
+		});
+		
+		let message = false;
+		if (shows_today.length == 0) {
+			message = 'No new episodes.';
+		}
+	
+		let images = shows_today.map((anime) => {
+			return anime.posterImage.medium;
+		});
+		
+		let titles = shows_today.map((anime) => {
+			return choosePreferredTitle(anime.titles);
+		});
+		
+		schedule.push({
+			dayIndex: date.getDay(),
+			date: date.getDate(),
+			header: header,
+			message: message,
+			titles: titles,
+			images: images
+		});
+	}
+	return schedule;
 }
 
-let fm = FileManager.iCloud();
-let template = Handlebars.compile(fm.readString(fm.documentsDirectory() + "/Templates/AnimeSchedule.hbs"));
-let html = template(view_data);
-Script.setShortcutOutput(html);
-Script.complete();
+function getWeekdayHeader(date) {
+	var day_index = date.getDay();
+	var now = new Date();
+	if (day_index === now.getDay()) {
+		return "TODAY";
+	} else {
+		return DAYS[day_index];
+	}
+}
+
+function hasAnimeEnded(anime) {
+	var now = new Date();
+	if (anime.endDate) {
+		let end_date = new Date(anime.endDate);
+		if (end_date < now) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function choosePreferredTitle(titles) {
+	if ("en" in titles) {
+		return titles.en;
+	} else if ("en_jp" in titles) {
+		return titles.en_jp;
+	} else {
+		return titles.ja_jp;
+	}
+}
+
+function scheduleWeekday(titles, dayIndex) {
+	let notify = new Notification();
+	notify.setWeeklyTrigger(dayIndex + 1, 8, 0, true);
+	notify.title = "New Episode" + titles.length > 0 ? "s" : "";
+	notify.body = titles.join("\n");
+	notify.threadIdentifier = NOTIFY_KEY;
+	notify.schedule();
+}
+
+function renderView(data) {
+	var fm = FileManager.iCloud();
+	var template = Handlebars.compile(fm.readString(fm.documentsDirectory() + "/Templates/AnimeSchedule.hbs"));
+	return template(data);
+}

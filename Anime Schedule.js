@@ -23,6 +23,11 @@ async function main() {
 		scheduleWeekday(day.titles, day.dayIndex);
 	});
 	
+	if (config.runsInWidget) {
+		await renderWidget(schedule);
+		return;
+	}
+	
 	var html = renderView({
 		days: schedule
 	});
@@ -34,12 +39,12 @@ async function main() {
 };
 
 async function resetNotifications() {
-	let notifications = await Notification.allPending();
-	for (let notification of notifications) {
-		if (notification.threadIdentifier === NOTIFY_KEY) {
-			  notification.remove();
-		}
-	}
+	var notifications = await Notification.allPending();
+	notifications.filter((notify) => {
+		return notify.threadIdentifier === NOTIFY_KEY;
+	}).forEach((notify) => {
+		notify.remove();
+	});
 }
 
 function buildSchedule(entries) {
@@ -129,4 +134,38 @@ function renderView(data) {
 	var fm = FileManager.iCloud();
 	var template = Handlebars.compile(fm.readString(fm.documentsDirectory() + "/Templates/AnimeSchedule.hbs"));
 	return template(data);
+}
+
+async function renderWidget(data) {
+	var today_data = data[0];
+	var widget = new ListWidget();
+	var header_font = Font.boldSystemFont(20);
+	var body_font = Font.lightSystemFont(18);
+	var fm = FileManager.iCloud();
+
+	var endColor = new Color("#1c1c1cb4");
+	var gradient = new LinearGradient();
+	gradient.colors = [endColor];
+	gradient.locations = [1];
+	widget.backgroundGradient = gradient;
+	
+	var text = widget.addText("Anime Schedule");
+	text.font = header_font;
+	widget.addSpacer(12);
+	if (today_data.titles.length == 0) {
+		widget.backgroundImage = Image.fromFile(fm.documentsDirectory() + "/Data/kitsu.PNG");
+		text = widget.addText("No new episodes.");
+		text.font = body_font;
+		text = widget.addText("Go read some manga!");
+		text.font = body_font;
+	} else {
+		let request = new Request(today_data.images[0]);
+		widget.backgroundImage = await request.loadImage();
+		today_data.titles.forEach((title) => {
+			text = widget.addText(title);
+			text.font = body_font;
+		});	
+	}
+	Script.setWidget(widget);
+	widget.presentMedium();
 }

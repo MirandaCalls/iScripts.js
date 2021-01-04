@@ -37,7 +37,8 @@ class AlgoliaSearch {
 		let http_rq = new Request(url);
 		http_rq.headers = {
 			'X-Algolia-Application-Id': this.app_id,
-			'X-Algolia-API-Key': this.api_key
+			'X-Algolia-API-Key': this.api_key,
+			Referer: 'https://aniplaylist.com/'
 		};
 
 		this.data_set = await http_rq.loadJSON();
@@ -58,7 +59,7 @@ class AniPlaylistAlbum {
 
 let input = args.shortcutParameter;
 input = input == null ? '' : input;
-let aniplaylist = new AlgoliaSearch('P4B7HT5P18', 'eacf3bb4eb1e59a0891c767d7b2765de', 'songs_prod');
+let aniplaylist = new AlgoliaSearch('P4B7HT5P18', 'cd90c9c918df8b42327310ade1f599bd', 'songs_prod');
 aniplaylist.setQueryString(input);
 let records = await aniplaylist.loadRecordSet();
 let albums = [];

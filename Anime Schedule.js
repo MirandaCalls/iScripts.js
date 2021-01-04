@@ -54,7 +54,7 @@ function buildSchedule(entries) {
 	var shows = entries.map((entry) => {
 		return entry.anime;
 	}).filter((anime) => {
-		return !hasAnimeEnded(anime);
+		return isAnimeCurrent(anime);
 	});
 	
 	for (let date = now; date <= end_date; date.setDate(date.getDate() + 1)) {
@@ -100,15 +100,14 @@ function getWeekdayHeader(date) {
 	}
 }
 
-function hasAnimeEnded(anime) {
+function isAnimeCurrent(anime) {
 	var now = new Date();
-	if (anime.endDate) {
-		let end_date = new Date(anime.endDate);
-		if (end_date < now) {
-			return true;
-		}
+	var start_date = anime.startDate ? new Date(anime.startDate) : now;
+	var end_date = anime.endDate ? new Date(anime.endDate) : now;
+	if (now < start_date || end_date < now) {
+		return false;
 	}
-	return false;
+	return true;
 }
 
 function choosePreferredTitle(titles) {
@@ -149,9 +148,9 @@ async function renderWidget(data) {
 	gradient.locations = [1];
 	widget.backgroundGradient = gradient;
 	
+	widget.addSpacer(null);
 	var text = widget.addText("Anime Schedule");
 	text.font = header_font;
-	widget.addSpacer(12);
 	if (today_data.titles.length == 0) {
 		widget.backgroundImage = Image.fromFile(fm.documentsDirectory() + "/Data/kitsu.PNG");
 		text = widget.addText("No new episodes.");

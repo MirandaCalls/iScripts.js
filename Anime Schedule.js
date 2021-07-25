@@ -48,20 +48,25 @@ async function resetNotifications() {
 }
 
 function buildSchedule(entries) {
+	var livechart = loadLivechartData();
 	var schedule = [];
 	var now = new Date();
 	var end_date = new Date().setDate(now.getDate() + 6);
 	var shows = entries.map((entry) => {
 		return entry.anime;
 	}).filter((anime) => {
-		return isAnimeCurrent(anime);
+		return livechart.hasOwnProperty(anime.id);
+	}).map((anime) => {
+		anime.nextAirdateMts = livechart[anime.id] * 1000;
+		return anime;
 	});
 	
 	for (let date = now; date <= end_date; date.setDate(date.getDate() + 1)) {
 		let header = getWeekdayHeader(date);
 		let shows_today = shows.filter((anime) => {
-			var start_date = new Date(anime.startDate);
-			var airs_on_this_day = date.getDay() == start_date.getUTCDay();
+			var airdate = new Date(anime.nextAirdateMts);
+			console.log(airdate)
+			var airs_on_this_day = date.getDay() == airdate.getDay();
 			return airs_on_this_day;
 		});
 		
@@ -100,14 +105,9 @@ function getWeekdayHeader(date) {
 	}
 }
 
-function isAnimeCurrent(anime) {
-	var now = new Date();
-	var start_date = anime.startDate ? new Date(anime.startDate) : now;
-	var end_date = anime.endDate ? new Date(anime.endDate) : now;
-	if (now < start_date || end_date < now) {
-		return false;
-	}
-	return true;
+function loadLivechartData() {
+	var fm = FileManager.iCloud();
+	return JSON.parse(fm.readString(fm.bookmarkedPath("Shortcuts") + "/livechart_latest.txt"));
 }
 
 function choosePreferredTitle(titles) {
@@ -158,7 +158,8 @@ async function renderWidget(data) {
 		text = widget.addText("Go read some manga!");
 		text.font = body_font;
 	} else {
-		let request = new Request(today_data.images[0]);
+		let img_url = today_data.images[Math.floor(Math.random() * today_data.images.length)];
+		let request = new Request(img_url);
 		widget.backgroundImage = await request.loadImage();
 		today_data.titles.forEach((title) => {
 			text = widget.addText(title);

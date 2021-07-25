@@ -1,7 +1,7 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: cyan; icon-glyph: book;
-const { renderTemplate } = importModule('Modules/WebUI.js');
+var Handlebars = importModule('Modules/handlebars.js');
 const ICloud = importModule("Modules/ICloud.js");
 
 const WORKOUT_INTENSITIES = {
@@ -95,7 +95,7 @@ function renderLogs()
             log_entry.workouts.forEach((workout, idx) => {
                 log_entry.workouts[idx].failedIcon = workout.failed ? '❌' : '✅';
             });
-            renderTemplate("ViewWorkoutLog.html", log_entry);
+            WebView.loadHTML(renderView("ViewWorkoutLog.hbs", log_entry));
         };
         table.addRow(row);
     }
@@ -111,9 +111,15 @@ function submitWorkoutForm() {
             label: workout.name
         });
     });
-    renderTemplate("SubmitWorkoutLog.html", data);
+    WebView.loadHTML(renderView("SubmitWorkoutLog.hbs", data));
 }
 
 function round5(x) {
     return Math.ceil(x / 5) * 5;
+}
+
+function renderView(viewFilename, data) {
+	var fm = FileManager.iCloud();
+	var template = Handlebars.compile(fm.readString(fm.documentsDirectory() + "/Templates/" + viewFilename));
+	return template(data);
 }

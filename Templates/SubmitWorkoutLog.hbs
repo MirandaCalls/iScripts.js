@@ -28,12 +28,12 @@
             </div>
             <label>Failed</label>
             <div class="form-group">
-                {%workoutList%}
+                {{#each workoutList}}
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="{{workout_id}}" id="CheckFail{{workout_id}}">
-                    <label class="form-check-label" for="CheckFail{{workout_id}}">{{label}}</label>
+                    <label class="form-check-label" for="CheckFail{{workout_id}}">{{this.label}}</label>
                 </div>
-                {%end%}
+                {{/each}}
             </div>
             <button type="button" id="BtnSubmit" class="btn btn-primary btn-block">Submit</button>
         </form>

@@ -1,8 +1,7 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: pink; icon-glyph: tv;
-const renderTemplate = importModule( 'Modules/WebUI.js' ).renderTemplate;
-
+var Handlebars = importModule('Modules/handlebars.js');
 const SEASONS = ["Winter", "Spring", "Summer", "Fall"];
 
 let current_date = new Date();
@@ -65,7 +64,7 @@ async function display_season( season, year ) {
 	
 		row.onSelect = async ( idx ) => {
 			let data = await getShowDetails( shows[ idx - 1 ], true );
-			renderTemplate( 'AnimeDetails.html', data );
+			WebView.loadHTML(renderView(data));
 		}
 	
 		table.addRow( row );
@@ -128,4 +127,10 @@ async function getCategories( categoriesUrl ) {
 	}
 
 	return names;
+}
+
+function renderView(data) {
+	var fm = FileManager.iCloud();
+	var template = Handlebars.compile(fm.readString(fm.documentsDirectory() + "/Templates/AnimeDetails.hbs"));
+	return template(data);
 }

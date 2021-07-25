@@ -1,9 +1,9 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: cyan; icon-glyph: dumbbell;
+var Handlebars = importModule('Modules/handlebars.js');
 const Modals = importModule('Modules/Modals.js');
 const ModalAction = Modals.ModalAction;
-const renderTemplate = importModule('Modules/WebUI.js').renderTemplate;
 
 const HEX_APPLE_BLUE = '#007AFF';
 
@@ -80,7 +80,7 @@ function renderWorkouts() {
 		let data = {
 			workout_cycles: calculateCyclesData(workouts)
 		}
-		renderTemplate('WorkoutRoutine.html', data);
+        WebView.loadHTML(renderView(data));
 	};
 	table.addRow(preview_row);
 
@@ -118,6 +118,12 @@ function deleteWorkout(index) {
 function appleBlue() {
 	let color = new Color(HEX_APPLE_BLUE);
 	return color;
+}
+
+function renderView(data) {
+	var fm = FileManager.iCloud();
+	var template = Handlebars.compile(fm.readString(fm.documentsDirectory() + "/Templates/WorkoutRoutine.hbs"));
+	return template(data);
 }
 
 let new_data = {

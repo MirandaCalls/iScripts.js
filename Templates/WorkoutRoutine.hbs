@@ -15,14 +15,14 @@
                 </tr>
             </thead>
             <tbody>
-            {%workout_cycles%}
+            {{#each workout_cycles}}
                 <tr>
-                    <th>{{name}}</th>
-                    <td>{{day_1_weight}}</td>
-                    <td>{{day_2_weight}}</td>
-                    <td>{{day_3_weight}}</td>
+                    <th>{{this.name}}</th>
+                    <td>{{this.day_1_weight}}</td>
+                    <td>{{this.day_2_weight}}</td>
+                    <td>{{this.day_3_weight}}</td>
                 </tr>
-            {%end%}
+            {{/each}}
             </tbody>
         </table>
     </div>

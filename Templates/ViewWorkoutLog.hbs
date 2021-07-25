@@ -30,22 +30,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {%workouts%}
+                    {{#each workouts}}
                     <tr>
-                        <td>{{name}}</td>
-                        <td>{{weight}} lbs</td>
-                        <td>{{failedIcon}}</td>
+                        <td>{{this.name}}</td>
+                        <td>{{this.weight}} lbs</td>
+                        <td>{{this.failedIcon}}</td>
                     </tr>
-                    {%end%}
+                    {{/each}}
                 </tbody>
             </table>
             <button type="button" id="BtnDelete" class="btn btn-secondary btn-block bg-danger" data-index="{{log_index}}">Delete</button>
         </div>
     </body>
     <script>
-        let delete_btn = document.getElementById("BtnDelete");
+        var delete_btn = document.getElementById("BtnDelete");
         delete_btn.onclick = () => {
             window.location = "scriptable:///run?scriptName=Workout%20Log&delete=" + delete_btn.dataset.index;
-        };
+        }
     </script>
 </html>

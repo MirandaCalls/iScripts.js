@@ -27,7 +27,7 @@ const COLORS = {
 };
 
 const iCloud = FileManager.iCloud();
-const config_path = iCloud.joinPath(iCloud.documentsDirectory(), '/Data/terminalWidget.json');
+const config_path = iCloud.joinPath(iCloud.documentsDirectory(), '/terminalWidget/config.json');
 const config = JSON.parse(iCloud.readString(config_path));
 
 // TODO: PLEASE SET THESE VALUES

@@ -1,7 +1,7 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: cyan; icon-glyph: weight;
-const renderTemplate = importModule( 'Modules/WebUI.js' ).renderTemplate;
+var Handlebars = importModule( 'Modules/handlebars.js' );
 
 const SEDENTARY = 1.2;
 const LIGHT = 1.375;
@@ -35,7 +35,7 @@ let data = {
     extremeLossAmount: two_pound_cal
 };
 
-renderTemplate( 'CalorieSummary.html', data );
+WebView.loadHTML(renderView(data));
 
 let new_data = JSON.stringify( health );
 fm.write( data_path, Data.fromString( new_data ) );
@@ -68,4 +68,10 @@ function bmr_calc( age, weight, height, gender ) {
         result -= 161;
     }
     return result;
+}
+
+function renderView(data) {
+	var fm = FileManager.iCloud();
+	var template = Handlebars.compile(fm.readString(fm.documentsDirectory() + "/Templates/CalorieSummary.hbs"));
+	return template(data);
 }

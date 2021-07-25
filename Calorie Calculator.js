@@ -25,7 +25,7 @@ if ( is_json_string( clipboard_content ) ) {
     }
 }
 
-let bmr = ( bmr_calc( health.age, health.weight, health.height, health.gender ) * LIGHT ).toFixed( 0 );
+let bmr = ( bmr_calc( health.age, health.weight, health.height, health.gender ) * SEDENTARY ).toFixed( 0 );
 let one_pound_cal = bmr - CALORIES_PER_POUND;
 let two_pound_cal = bmr - ( CALORIES_PER_POUND * 2 );
 
